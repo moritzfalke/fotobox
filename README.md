@@ -1,2 +1,2 @@
-# photobox
-photobox for NdA and Sommerfest
+# fotobox
+fotobox for NdA and Sommerfest
