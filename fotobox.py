@@ -42,3 +42,8 @@ def main():
     print("press the button to take a photo")
 
     camera.start_preview(resolution=(screen_w,screen_h))
+    sleep(10)
+
+
+if __name__ == "__main__":
+    main()
