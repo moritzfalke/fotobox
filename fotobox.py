@@ -7,6 +7,7 @@ import configparser
 # Setup Config
 config = configparser.ConfigParser()
 config.read('config.ini')
+print('read the config')
 
 pin_camera_btn = int(config['CONFIGURATION']['pin_camera_btn'])
 pin_confirm_btn = int(config['CONFIGURATION']['pin_confirm_btn'])
@@ -29,12 +30,9 @@ debounce = 0.05  # Min duration (seconds) button is required to be "pressed in" 
 # Setup Camera
 
 camera = picamera.PiCamera()
-camera.rotation = 270
+#camera.rotation = 270
 camera.resolution = (photo_h, photo_w)
-camera.hflip = True
-
-# Path
-REAL_PATH = os.path.dirname(os.path.realpath(__file__))
+#camera.hflip = True
 
 
 def main():
@@ -43,7 +41,7 @@ def main():
 
     camera.start_preview(resolution=(screen_w,screen_h))
     sleep(10)
+    camera.stop_preview()
 
 
-if __name__ == "__main__":
-    main()
+main()
