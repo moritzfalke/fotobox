@@ -3,6 +3,7 @@ from time import sleep
 import RPi.GPIO as GPIO
 import picamera
 import configparser
+import os
 
 # Setup Config
 config = configparser.ConfigParser()
