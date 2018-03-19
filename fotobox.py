@@ -4,6 +4,8 @@ import RPi.GPIO as GPIO
 import picamera
 import configparser
 import os
+from datetime import datetime
+
 
 # Setup Config
 config = configparser.ConfigParser()
@@ -35,6 +37,20 @@ camera = picamera.PiCamera()
 camera.resolution = (photo_h, photo_w)
 #camera.hflip = True
 
+def get_filename():
+    filename = str(datetime.now()).split('.')[0]
+    filename = filename.replace(' ', '_')
+    filename = filename.replace(':', '-')
+    filename += ".jpg"
+    return filename
+
+
+
+def take_picture():
+    print("took a picture")
+    filename = get_filename()
+    camera.capture(filename)
+
 
 def main():
     print("startup")
@@ -42,7 +58,24 @@ def main():
 
     camera.start_preview(resolution=(screen_w,screen_h))
     sleep(10)
+    while true:
+        input_state = GPIO.input(pin_camera_btn)
+        if input_state == False:
+            sleep(debounce)
+            if input_state == False:
+                print("took a picture")
+                take_picture()
+                time.sleep(0.05)
+
+try:
+    main()
+except KeyboardInterrupt:
+    print("goodbye")
+
+except Exception as exception:
+    print("unexpected error: ", str(exception))
+
+finally:
     camera.stop_preview()
-
-
-main()
+    camera.close()
+    GPIO.cleanup()
