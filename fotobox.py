@@ -38,7 +38,7 @@ camera.resolution = (photo_h, photo_w)
 #camera.hflip = True
 
 def get_filename():
-    filename = str(datetime.now()).split('.')[0]
+    filename = "/pictures/" + str(datetime.now()).split('.')[0]
     filename = filename.replace(' ', '_')
     filename = filename.replace(':', '-')
     filename += ".jpg"
@@ -58,14 +58,14 @@ def main():
 
     camera.start_preview(resolution=(screen_w,screen_h))
     sleep(10)
-    while true:
+    while True:
         input_state = GPIO.input(pin_camera_btn)
         if input_state == False:
             sleep(debounce)
             if input_state == False:
                 print("took a picture")
                 take_picture()
-                time.sleep(0.05)
+                sleep(0.05)
 
 try:
     main()
