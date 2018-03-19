@@ -39,7 +39,11 @@ camera.resolution = (photo_h, photo_w)
 #camera.hflip = True
 
 def get_filename():
+    
     filename = REAL_PATH + "/pictures/" + str(datetime.now()).split('.')[0]
+
+    filename = "/pictures/" + str(datetime.now()).split('.')[0]
+
     filename = filename.replace(' ', '_')
     filename = filename.replace(':', '-')
     filename += ".jpg"
