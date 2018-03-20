@@ -39,11 +39,8 @@ camera.resolution = (photo_h, photo_w)
 #camera.hflip = True
 
 def get_filename():
-    
     filename = REAL_PATH + "/pictures/" + str(datetime.now()).split('.')[0]
-
-    filename = "/pictures/" + str(datetime.now()).split('.')[0]
-
+#    filename = "/pictures/" + str(datetime.now()).split('.')[0]
     filename = filename.replace(' ', '_')
     filename = filename.replace(':', '-')
     filename += ".jpg"
@@ -55,6 +52,7 @@ def take_picture():
     print("took a picture")
     filename = get_filename()
     camera.capture(filename)
+    sleep(1)
 
 
 def main():
@@ -70,7 +68,7 @@ def main():
             if input_state == False:
                 print("took a picture")
                 take_picture()
-                sleep(0.05)
+        sleep(0.05)
 
 try:
     main()
