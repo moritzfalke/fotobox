@@ -22,13 +22,24 @@ photo_h = int(config['CONFIGURATION']['photo_h'])
 screen_w = int(config['CONFIGURATION']['screen_w'])
 screen_h = int(config['CONFIGURATION']['screen_h'])
 
+# Setup Twitter
+consumer_key = config['TWITTER']['consumer_key']
+consumer_secret = config['TWITTER']['consumer_secret']
+access_token = config['TWITTER']['access_token']
+access_token_secret = config['TWITTER']['access_token_secret']
+
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
+twitter = tweepy.API(auth)
+
+
 # Setup GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(pin_camera_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(pin_confirm_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(pin_cancel_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-debounce = 0.05  # Min duration (seconds) button is required to be "pressed in" for.
+debounce = 0.02  # Min duration (seconds) button is required to be "pressed in" for.
 
 
 # Setup Camera
@@ -52,7 +63,11 @@ def take_picture():
     print("took a picture")
     filename = get_filename()
     camera.capture(filename)
+    tweet(filename)
     sleep(1)
+
+def tweet(filename):
+    twitter.update_with_media(filename, 'test')
 
 
 def main():
@@ -66,7 +81,6 @@ def main():
         if input_state == False:
             sleep(debounce)
             if input_state == False:
-                print("took a picture")
                 take_picture()
         sleep(0.05)
 
