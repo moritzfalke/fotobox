@@ -23,6 +23,9 @@ screen_w = int(config['CONFIGURATION']['screen_w'])
 screen_h = int(config['CONFIGURATION']['screen_h'])
 
 # Setup Twitter
+twitter_enabled = (config['TWITTER']['enable'] == 'X')
+hastags = config['TWITTER']['hashtags']
+hashtags_amount = config['TWITTER']['hashtags_amount']
 consumer_key = config['TWITTER']['consumer_key']
 consumer_secret = config['TWITTER']['consumer_secret']
 access_token = config['TWITTER']['access_token']
@@ -60,10 +63,14 @@ def get_filename():
 
 
 def take_picture():
-    print("took a picture")
+    for x in prep_delay:
+        camera.annotate_text(x+1)
+        sleep(1)
     filename = get_filename()
     camera.capture(filename)
-    tweet(filename)
+    print("took a picture")
+    if twitter_enabled:
+        tweet(filename)
     sleep(1)
 
 def tweet(filename):
