@@ -63,8 +63,9 @@ def get_filename():
 
 
 def take_picture():
-    for x in prep_delay:
-        camera.annotate_text(x+1)
+    for x in range(prep_delay):
+        camera.annotate_text(prep_delay - x)
+        print("picture in" + (prep_delay - x))
         sleep(1)
     filename = get_filename()
     camera.capture(filename)
