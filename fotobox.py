@@ -24,7 +24,7 @@ screen_h = int(config['CONFIGURATION']['screen_h'])
 
 # Setup Twitter
 twitter_enabled = (config['TWITTER']['enable'] == 'X')
-hastags = config['TWITTER']['hashtags']
+always_hastags = config['TWITTER']['always_hashtags']
 hashtags_amount = config['TWITTER']['hashtags_amount']
 consumer_key = config['TWITTER']['consumer_key']
 consumer_secret = config['TWITTER']['consumer_secret']
