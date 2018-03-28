@@ -92,20 +92,24 @@ def ready_for_tweet(filename):
 #        ))
     pad.paste(img, (0,0))
     o = camera.add_overlay(pad.tobytes(), size = img.size)
-    o.alpha = 128
+    o.alpha = 255 
     o.layer = 3
+    print("Do you want to tweet the picture?")
     while True:
         input_state_confirm = GPIO.input(pin_confirm_btn)
         input_state_cancel = GPIO.input(pin_cancel_btn)
         if input_state_confirm == False:
             sleep(debounce)
             if input_state_confirm == False:
+                print("tweeting")
                 tweet(filename)
+                break
         elif input_state_cancel == False:
             sleep(debounce)
             if input_state_cancel == False:
+                print("cancelled tweeting")
                 break
-    sleep(0.05)
+        sleep(0.05)
 
 def main():
     print("startup")
