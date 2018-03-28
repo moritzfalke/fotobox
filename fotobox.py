@@ -1,3 +1,4 @@
+
 import tweepy
 from time import sleep
 import RPi.GPIO as GPIO
@@ -5,6 +6,7 @@ import picamera
 import configparser
 import os
 from datetime import datetime
+from PIL import Image
 
 REAL_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -63,27 +65,53 @@ def get_filename():
 
 
 def take_picture():
-    for x in range(prep_delay):
-        camera.annotate_text(prep_delay - x)
-        print("picture in" + (prep_delay - x))
+    for x in range(prep_delay, 0 , -1):
+        camera.annotate_text = ("      " + str(x) )
+        print("picture in" + str( x))
         sleep(1)
     filename = get_filename()
     camera.capture(filename)
     print("took a picture")
-    if twitter_enabled:
-        tweet(filename)
+    ready_for_tweet(filename)
+#    if twitter_enabled:
+#        tweet(filename)
     sleep(1)
 
 def tweet(filename):
     twitter.update_with_media(filename, 'test')
 
+def ready_for_tweet(filename):
+    img = Image.open(filename)
+    pad = Image.new('RGB', (
+        ((img.size[0] + 31) // 32) * 32,
+        ((img.size[1] + 15) // 16) * 16,
+        ))
+#    pad = Image.new('RGB', (
+#        ((img.size[0] +31) // 32) * 32,
+#        ((img.size[1] + 15 // 16) *16,
+#        ))
+    pad.paste(img, (0,0))
+    o = camera.add_overlay(pad.tobytes(), size = img.size)
+    o.alpha = 128
+    o.layer = 3
+    while True:
+        input_state_confirm = GPIO.input(pin_confirm_btn)
+        input_state_cancel = GPIO.input(pin_cancel_btn)
+        if input_state_confirm == False:
+            sleep(debounce)
+            if input_state_confirm == False:
+                tweet(filename)
+        elif input_state_cancel == False:
+            sleep(debounce)
+            if input_state_cancel == False:
+                break
+    sleep(0.05)
 
 def main():
     print("startup")
     print("press the button to take a photo")
 
     camera.start_preview(resolution=(screen_w,screen_h))
-    sleep(10)
     while True:
         input_state = GPIO.input(pin_camera_btn)
         if input_state == False:
@@ -97,8 +125,8 @@ try:
 except KeyboardInterrupt:
     print("goodbye")
 
-except Exception as exception:
-    print("unexpected error: ", str(exception))
+#except Exception as exception:
+#    print("unexpected error: ", str(exception))
 
 finally:
     camera.stop_preview()
