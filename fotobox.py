@@ -70,7 +70,7 @@ def take_picture():
         print("picture in" + str( x))
         sleep(1)
     filename = get_filename()
-    camera.remove_overlay()
+    camera.annotate_text = ""
     camera.capture(filename)
     print("took a picture")
     if(twitter_enabled):
@@ -103,7 +103,7 @@ def ready_for_tweet(filename):
                 camera.annotate_text = "tweeted successfully!"
                 sleep(1)
                 camera.annotate_text = ""
-                camera.remove_overlay()
+                camera.remove_overlay(o)
                 break
         elif input_state_cancel == False:
             sleep(debounce)
@@ -112,7 +112,7 @@ def ready_for_tweet(filename):
                 camera.annotate_text = "Did not tweet"
                 sleep(1)
                 camera.annotate_text = ""
-                camera.remove_overlay()
+                camera.remove_overlay(o)
                 break
         sleep(0.05)
 
@@ -127,7 +127,6 @@ def main():
             sleep(debounce)
             if input_state == False:
                 camera.annotate_text = ""
-                camera.remove_overlay()
                 take_picture()
         sleep(0.05)
 
