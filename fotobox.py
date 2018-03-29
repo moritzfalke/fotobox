@@ -70,11 +70,11 @@ def take_picture():
         print("picture in" + str( x))
         sleep(1)
     filename = get_filename()
+    camera.remove_overlay()
     camera.capture(filename)
     print("took a picture")
-    ready_for_tweet(filename)
-#    if twitter_enabled:
-#        tweet(filename)
+    if(twitter_enabled):
+        ready_for_tweet(filename)
     sleep(1)
 
 def tweet(filename):
@@ -86,10 +86,6 @@ def ready_for_tweet(filename):
         ((img.size[0] + 31) // 32) * 32,
         ((img.size[1] + 15) // 16) * 16,
         ))
-#    pad = Image.new('RGB', (
-#        ((img.size[0] +31) // 32) * 32,
-#        ((img.size[1] + 15 // 16) *16,
-#        ))
     pad.paste(img, (0,0))
     o = camera.add_overlay(pad.tobytes(), size = img.size)
     o.alpha = 255 
@@ -103,19 +99,21 @@ def ready_for_tweet(filename):
             if input_state_confirm == False:
                 print("tweeting")
                 tweet(filename)
+                camera.remove_overlay()
                 break
         elif input_state_cancel == False:
             sleep(debounce)
             if input_state_cancel == False:
                 print("cancelled tweeting")
+                camera.remove_overlay()
                 break
         sleep(0.05)
 
 def main():
     print("startup")
-    print("press the button to take a photo")
-
     camera.start_preview(resolution=(screen_w,screen_h))
+    camera.annotate_text("Press the bottom red Button to take a picture!")
+    print("press the button to take a photo")
     while True:
         input_state = GPIO.input(pin_camera_btn)
         if input_state == False:
