@@ -115,6 +115,7 @@ def ready_for_tweet(filename):
                 camera.remove_overlay(o)
                 break
         sleep(0.05)
+    print("finished ready for tweet")
 
 def main():
     print("startup")
