@@ -111,7 +111,7 @@ def ready_for_tweet(filename):
         ((img.size[1] + 15) // 16) * 16,
     ))
     padnew.paste(img, (0, 0))
-    onew = camera.add_overlay(pad.tostring(), size=img.size)
+    onew = camera.add_overlay(pad.tobytes(), size=img.size)
     onew.alpha = 128
     onew.layer = 4
     sleep(4)
