@@ -185,16 +185,23 @@ def main():
 #    camera.annotate_text = "Press the bottom red Button to take a picture!"
     print("press the button to take a photo")
     image = "./take_picture.png"
-    overlay = overlay_image(image, 0, 4)
+    pressed = False
+    overlay = 0
     while True:
+        if(overlay == 0):
+            overlay = overlay_image(image, 0, 3)
         input_state = GPIO.input(pin_camera_btn)
         if input_state == False:
             sleep(debounce)
             if input_state == False:
-                camera.annotate_text = ""
-                remove_overlay(overlay)
-                take_picture()
+                pressed = True
         sleep(0.05)
+        if(pressed):
+            camera.annotate_text = ""
+            remove_overlay(overlay)
+            take_picture()
+            overlay = overlay_image(image, 0, 4)
+
 
 try:
     main()
