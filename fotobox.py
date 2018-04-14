@@ -135,6 +135,8 @@ def tweet(filename):
 def ready_for_tweet(filename):
    # camera.annotate_text = "Do you want to tweet the picture? Press the green button for yes and the red Button to cancel"
     print("Do you want to tweet the picture?")
+    image = './tweet.png'
+    overlay = overlay_image(image, 0 , 4)
     while True:
         input_state_confirm = GPIO.input(pin_confirm_btn)
         input_state_cancel = GPIO.input(pin_cancel_btn)
@@ -143,6 +145,7 @@ def ready_for_tweet(filename):
             if input_state_confirm == False:
                 print("tweeting")
                 tweet(filename)
+                remove_overlay(overlay)
                 camera.annotate_text = "tweeted successfully!"
                 sleep(1)
                 camera.annotate_text = ""
@@ -151,6 +154,7 @@ def ready_for_tweet(filename):
             sleep(debounce)
             if input_state_cancel == False:
                 print("cancelled tweeting")
+                remove_overlay(overlay)
                 camera.annotate_text = "Did not tweet"
                 sleep(1)
                 camera.annotate_text = ""
@@ -163,7 +167,7 @@ def main():
     camera.start_preview(resolution=(screen_w,screen_h))
 #    camera.annotate_text = "Press the bottom red Button to take a picture!"
     print("press the button to take a photo")
-    image = "./tweet.png"
+    image = "./take_picture.png"
     overlay = overlay_image(image, 0, 4)
     while True:
         input_state = GPIO.input(pin_camera_btn)
