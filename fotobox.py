@@ -144,28 +144,6 @@ def tweet(filename):
     twitter.update_with_media(filename, 'test')
 
 def ready_for_tweet(filename):
-
-    img = Image.open(filename)
-    pad = Image.new('RGB', (
-        ((img.size[0] + 31) // 32) * 32,
-        ((img.size[1] + 15) // 16) * 16,
-    ))
-    pad.paste(img, (0, 0))
-    o = camera.add_overlay(pad.tobytes(), size=img.size)
-    o.alpha = 255
-    o.layer = 3
-
-    img = Image.open('tweet.png')
-    padnew = Image.new('RGB', (
-        ((img.size[0] + 31) // 32) * 32,
-        ((img.size[1] + 15) // 16) * 16,
-    ))
-    padnew.paste(img, (0, 0))
-    onew = camera.add_overlay(pad.tobytes(), size=img.size)
-    onew.alpha = 128
-    onew.layer = 4
-    sleep(4)
-    camera.remove_overlay(onew)
    # camera.annotate_text = "Do you want to tweet the picture? Press the green button for yes and the red Button to cancel"
     print("Do you want to tweet the picture?")
     while True:
@@ -199,7 +177,7 @@ def main():
 #    camera.annotate_text = "Press the bottom red Button to take a picture!"
     print("press the button to take a photo")
     image = "./tweet.png"
-    overlay = overlay_image(image, 0, 3)
+    overlay = overlay_image(image, 0, 4)
     while True:
         input_state = GPIO.input(pin_camera_btn)
         if input_state == False:
