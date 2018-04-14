@@ -93,7 +93,7 @@ def overlay_image(image_path, duration=0, layer=3):
     ))
 
     # Paste the original image into the padded one
-    pad.paste(img, (0, 0))
+    pad.paste(img, (0, 0), img)
 
     #Get the padded image data
     try:
