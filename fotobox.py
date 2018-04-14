@@ -200,6 +200,7 @@ def main():
             camera.annotate_text = ""
             remove_overlay(overlay)
             take_picture()
+            pressed = False
             overlay = overlay_image(image, 0, 4)
 
 
