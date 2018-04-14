@@ -87,13 +87,13 @@ def overlay_image(image_path, duration=0, layer=3):
     img = Image.open(image_path)
 
     # Create an image padded to the required size with mode 'RGB'
-    pad = Image.new('RGB', (
+    pad = Image.new('RGBA', (
         ((img.size[0] + 31) // 32) * 32,
         ((img.size[1] + 15) // 16) * 16,
     ))
 
     # Paste the original image into the padded one
-    pad.paste(img, (0, 0), img)
+    pad.paste(img, (0, 0))
 
     #Get the padded image data
     try:
