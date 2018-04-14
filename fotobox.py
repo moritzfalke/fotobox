@@ -62,6 +62,56 @@ def get_filename():
     filename += ".jpg"
     return filename
 
+def remove_overlay(overlay_id):
+    """
+    If there is an overlay, remove it
+    """
+    if overlay_id != -1:
+        camera.remove_overlay(overlay_id)
+
+
+def overlay_image(image_path, duration=0, layer=3):
+    """
+    Add an overlay (and sleep for an optional duration).
+    If sleep duration is not supplied, then overlay will need to be removed later.
+    This function returns an overlay id, which can be used to remove_overlay(id).
+    """
+
+    # "The camera`s block size is 32x16 so any image data
+    #  provided to a renderer must have a width which is a
+    #  multiple of 32, and a height which is a multiple of
+    #  16."
+    #  Refer: http://picamera.readthedocs.io/en/release-1.10/recipes1.html#overlaying-images-on-the-preview
+
+    # Load the arbitrarily sized image
+    img = Image.open(image_path)
+
+    # Create an image padded to the required size with mode 'RGB'
+    pad = Image.new('RGB', (
+        ((img.size[0] + 31) // 32) * 32,
+        ((img.size[1] + 15) // 16) * 16,
+    ))
+
+    # Paste the original image into the padded one
+    pad.paste(img, (0, 0))
+
+    #Get the padded image data
+    try:
+        padded_img_data = pad.tobytes()
+    except AttributeError:
+        padded_img_data = pad.tostring() # Note: tostring() is deprecated in PIL v3.x
+
+    # Add the overlay with the padded image as the source,
+    # but the original image's dimensions
+    o_id = camera.add_overlay(padded_img_data, size=img.size)
+    o_id.layer = layer
+
+    if duration > 0:
+        sleep(duration)
+        camera.remove_overlay(o_id)
+        o_id = -1 # '-1' indicates there is no overlay
+
+    return o_id # if we have an overlay (o_id > 0), we will need to remove it later
 
 
 def take_picture():
@@ -73,15 +123,15 @@ def take_picture():
     camera.annotate_text = ""
     camera.capture(filename)
     print("took a picture")
-    img = Image.open(filename)
-    pad = Image.new('RGB', (
-        ((img.size[0] + 31) // 32) * 32,
-        ((img.size[1] + 15) // 16) * 16,
-    ))
-    pad.paste(img, (0, 0))
-    o = camera.add_overlay(pad.tobytes(), size=img.size)
-    o.alpha = 255
-    o.layer = 3
+    # img = Image.open(filename)
+    # pad = Image.new('RGB', (
+    #     ((img.size[0] + 31) // 32) * 32,
+    #     ((img.size[1] + 15) // 16) * 16,
+    # ))
+    # pad.paste(img, (0, 0))
+    # o = camera.add_overlay(pad.tobytes(), size=img.size)
+    # o.alpha = 255
+    # o.layer = 3
     if(twitter_enabled):
         camera.remove_overlay(o)
         ready_for_tweet(filename)
@@ -105,7 +155,7 @@ def ready_for_tweet(filename):
     o.alpha = 255
     o.layer = 3
 
-    img = Image.open('tweet.jpg')
+    img = Image.open('tweet.png')
     padnew = Image.new('RGB', (
         ((img.size[0] + 31) // 32) * 32,
         ((img.size[1] + 15) // 16) * 16,
@@ -146,14 +196,17 @@ def ready_for_tweet(filename):
 def main():
     print("startup")
     camera.start_preview(resolution=(screen_w,screen_h))
-    camera.annotate_text = "Press the bottom red Button to take a picture!"
+#    camera.annotate_text = "Press the bottom red Button to take a picture!"
     print("press the button to take a photo")
+    image = "./tweet.png"
+    overlay = overlay_image(image, 0, 3)
     while True:
         input_state = GPIO.input(pin_camera_btn)
         if input_state == False:
             sleep(debounce)
             if input_state == False:
                 camera.annotate_text = ""
+                remove_overlay(overlay)
                 take_picture()
         sleep(0.05)
 
