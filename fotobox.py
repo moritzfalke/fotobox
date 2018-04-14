@@ -6,6 +6,7 @@ import picamera
 import configparser
 import os
 from datetime import datetime
+from sys import exit as sys_exit
 from PIL import Image
 
 REAL_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -14,24 +15,35 @@ REAL_PATH = os.path.dirname(os.path.realpath(__file__))
 config = configparser.ConfigParser()
 config.read('config.ini')
 print('read the config')
-
-pin_camera_btn = int(config['CONFIGURATION']['pin_camera_btn'])
-pin_confirm_btn = int(config['CONFIGURATION']['pin_confirm_btn'])
-pin_cancel_btn = int(config['CONFIGURATION']['pin_cancel_btn'])
-prep_delay = int(config['CONFIGURATION']['prep_delay'])
-photo_w = int(config['CONFIGURATION']['photo_w'])
-photo_h = int(config['CONFIGURATION']['photo_h'])
-screen_w = int(config['CONFIGURATION']['screen_w'])
-screen_h = int(config['CONFIGURATION']['screen_h'])
+try:
+    pin_camera_btn = int(config['CONFIGURATION']['pin_camera_btn'])
+    pin_confirm_btn = int(config['CONFIGURATION']['pin_confirm_btn'])
+    pin_cancel_btn = int(config['CONFIGURATION']['pin_cancel_btn'])
+    prep_delay = int(config['CONFIGURATION']['prep_delay'])
+    photo_w = int(config['CONFIGURATION']['photo_w'])
+    photo_h = int(config['CONFIGURATION']['photo_h'])
+    screen_w = int(config['CONFIGURATION']['screen_w'])
+    screen_h = int(config['CONFIGURATION']['screen_h'])
 
 # Setup Twitter
-twitter_enabled = (config['TWITTER']['enable'] == 'X')
-always_hastags = config['TWITTER']['always_hashtags']
-hashtags_amount = config['TWITTER']['hashtags_amount']
-consumer_key = config['TWITTER']['consumer_key']
-consumer_secret = config['TWITTER']['consumer_secret']
-access_token = config['TWITTER']['access_token']
-access_token_secret = config['TWITTER']['access_token_secret']
+    twitter_enabled = (config['TWITTER']['enable'] == 'X')
+    if(twitter_enabled):
+        always_hastags = config['TWITTER']['always_hashtags']
+        hashtags_amount = config['TWITTER']['hashtags_amount']
+        consumer_key = config['TWITTER']['consumer_key']
+        consumer_secret = config['TWITTER']['consumer_secret']
+        access_token = config['TWITTER']['access_token']
+        access_token_secret = config['TWITTER']['access_token_secret']
+except KeyError as exc:
+    print('')
+    print('ERROR:')
+    print(' - Problems exist within configuration file.')
+    print(' - The expected configuration item ' + str(exc) + ' was not found.')
+#    print(' - Please refer to the example file [' + PATH_TO_CONFIG_EXAMPLE + '], for reference.')
+    print('')
+    sys_exit()
+
+
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
@@ -126,7 +138,8 @@ def take_picture():
     if(twitter_enabled):
         ready_for_tweet(filename)
     else:
-        sleep(5)
+        overlay_image(filename, 5, 3)
+
     sleep(1)
 
 def tweet(filename):
@@ -136,7 +149,8 @@ def ready_for_tweet(filename):
    # camera.annotate_text = "Do you want to tweet the picture? Press the green button for yes and the red Button to cancel"
     print("Do you want to tweet the picture?")
     image = './tweet.png'
-    overlay = overlay_image(image, 0 , 4)
+    image_overlay = overlay_image(filename, 0, 3)
+    tweet_text = overlay_image(image, 0 , 4)
     while True:
         input_state_confirm = GPIO.input(pin_confirm_btn)
         input_state_cancel = GPIO.input(pin_cancel_btn)
@@ -145,7 +159,8 @@ def ready_for_tweet(filename):
             if input_state_confirm == False:
                 print("tweeting")
                 tweet(filename)
-                remove_overlay(overlay)
+                remove_overlay(image_overlay)
+                remove_overlay(tweet_text)
                 camera.annotate_text = "tweeted successfully!"
                 sleep(1)
                 camera.annotate_text = ""
@@ -154,7 +169,8 @@ def ready_for_tweet(filename):
             sleep(debounce)
             if input_state_cancel == False:
                 print("cancelled tweeting")
-                remove_overlay(overlay)
+                remove_overlay(image_overlay)
+                remove_overlay(tweet_text)
                 camera.annotate_text = "Did not tweet"
                 sleep(1)
                 camera.annotate_text = ""
@@ -165,6 +181,7 @@ def ready_for_tweet(filename):
 def main():
     print("startup")
     camera.start_preview(resolution=(screen_w,screen_h))
+#    camera.zoom = (0.0, 0.0, 2.0, 2.0)
 #    camera.annotate_text = "Press the bottom red Button to take a picture!"
     print("press the button to take a photo")
     image = "./take_picture.png"
