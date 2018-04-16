@@ -159,10 +159,12 @@ def ready_for_tweet(filename):
             if input_state_confirm == False:
                 print("tweeting")
                 tweet(filename)
-                remove_overlay(image_overlay)
                 remove_overlay(tweet_text)
-                camera.annotate_text = "tweeted successfully!"
-                sleep(1)
+                successful_tweet = './successful_tweet.png'
+                overlay_image(successful_tweet, 4, 4)
+#                camera.annotate_text = "tweeted successfully!"
+#                sleep(1)
+                remove_overlay(image_overlay)
                 camera.annotate_text = ""
                 break
         elif input_state_cancel == False:
