@@ -44,11 +44,14 @@ except KeyError as exc:
     sys_exit()
 
 
-
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_token_secret)
-twitter = tweepy.API(auth)
-
+if(twitter_enabled):
+    try:
+        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        auth.set_access_token(access_token, access_token_secret)
+        twitter = tweepy.API(auth)
+    except TweepError as te:
+        print('ERROR: Something went wrong with Twitter, aborting')
+        sys_exit()
 
 # Setup GPIO
 GPIO.setmode(GPIO.BCM)
@@ -158,8 +161,11 @@ def ready_for_tweet(filename):
             sleep(debounce)
             if input_state_confirm == False:
                 print("tweeting")
-                tweet(filename)
                 remove_overlay(tweet_text)
+                wait_for_tweet = './wait_for_tweet.png'
+                o_wait = overlay_image(wait_for_tweet, 0 , 4)
+                tweet(filename)
+                remove_overlay(o_wait)
                 successful_tweet = './successful_tweet.png'
                 overlay_image(successful_tweet, 4, 4)
 #                camera.annotate_text = "tweeted successfully!"
@@ -206,7 +212,6 @@ def main():
             take_picture()
             pressed = False
             overlay = overlay_image(image, 0, 4)
-
 
 try:
     main()
