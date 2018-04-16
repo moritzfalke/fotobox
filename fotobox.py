@@ -170,7 +170,8 @@ def ready_for_tweet(filename):
             if input_state_cancel == False:
                 print("cancelled tweeting")
                 remove_overlay(tweet_text)
-                image_overlay('./cancel_tweet.png', 4, 4)
+                cancel_tweet = './cancel_tweet.png'
+                image_overlay(cancel_tweet, 4, 4)
 #                camera.annotate_text = "Did not tweet"
 #                sleep(1)
                 remove_overlay(image_overlay)
