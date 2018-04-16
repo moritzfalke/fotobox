@@ -100,4 +100,8 @@ ENV/
 # mypy
 .mypy_cache/
 
+# Pycharm and pydev
 .idea/
+.project
+.pydevproject
+.pydevproject.bak
