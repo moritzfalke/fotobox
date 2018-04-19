@@ -30,6 +30,12 @@ try:
     photo_h = int(config['CONFIGURATION']['photo_h'])
     screen_w = int(config['CONFIGURATION']['screen_w'])
     screen_h = int(config['CONFIGURATION']['screen_h'])
+    zoom_x = float(config['ZOOM']['x'])
+    zoom_y = float(config['ZOOM']['y'])
+    zoom_w = float(config['ZOOM']['w'])
+    zoom_h = float(config['ZOOM']['h'])
+
+
 
 # Setup Twitter
     twitter_enabled = (config['TWITTER']['enable'] == 'X')
@@ -223,7 +229,7 @@ def ready_for_tweet(filename):
 def main():
     print("startup")
     camera.start_preview(resolution=(screen_w, screen_h))
-#    camera.zoom = (0.0, 0.0, 2.0, 2.0)
+    camera.zoom = (zoom_x, zoom_y, zoom_w, zoom_h)
 #    camera.annotate_text = "Press the bottom red Button to take a picture!"
     print("press the button to take a photo")
     camera.annotate_text = ("Today taken pictures: " +
