@@ -8,9 +8,14 @@ import os
 from datetime import datetime
 from sys import exit as sys_exit
 from PIL import Image
+import counter
 from tweepy import TweepError
 
 REAL_PATH = os.path.dirname(os.path.realpath(__file__))
+
+# Setting up counter
+counter.createFile()
+counter.readData()
 
 # Setup Config
 config = configparser.ConfigParser()
@@ -60,7 +65,8 @@ GPIO.setup(pin_camera_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(pin_confirm_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(pin_cancel_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-debounce = 0.02  # Min duration (seconds) button is required to be "pressed in" for.
+# Min duration (seconds) button is required to be "pressed in" for.
+debounce = 0.02
 
 pictureNumber = 0
 
@@ -71,6 +77,7 @@ camera = picamera.PiCamera()
 camera.resolution = (photo_h, photo_w)
 camera.hflip = True
 
+
 def get_filename():
     filename = REAL_PATH + "/pictures/" + str(datetime.now()).split('.')[0]
 #    filename = "/pictures/" + str(datetime.now()).split('.')[0]
@@ -78,6 +85,7 @@ def get_filename():
     filename = filename.replace(':', '-')
     filename += ".jpg"
     return filename
+
 
 def remove_overlay(overlay_id):
     """
@@ -112,11 +120,11 @@ def overlay_image(image_path, duration=0, layer=3):
     # Paste the original image into the padded one
     pad.paste(img, (0, 0))
 
-    #Get the padded image data
+    # Get the padded image data
     try:
         padded_img_data = pad.tobytes()
     except AttributeError:
-        padded_img_data = pad.tostring() # Note: tostring() is deprecated in PIL v3.x
+        padded_img_data = pad.tostring()  # Note: tostring() is deprecated in PIL v3.x
 
     # Add the overlay with the padded image as the source,
     # but the original image's dimensions
@@ -126,15 +134,16 @@ def overlay_image(image_path, duration=0, layer=3):
     if duration > 0:
         sleep(duration)
         camera.remove_overlay(o_id)
-        o_id = -1 # '-1' indicates there is no overlay
+        o_id = -1  # '-1' indicates there is no overlay
 
-    return o_id # if we have an overlay (o_id > 0), we will need to remove it later
+    # if we have an overlay (o_id > 0), we will need to remove it later
+    return o_id
 
 
 def take_picture():
-    for x in range(prep_delay, 0 , -1):
-        camera.annotate_text = ("      " + str(x) )
-        print("picture in" + str( x))
+    for x in range(prep_delay, 0, -1):
+        camera.annotate_text = ("      " + str(x))
+        print("picture in" + str(x))
         sleep(1)
     filename = get_filename()
     camera.annotate_text = ""
@@ -148,6 +157,7 @@ def take_picture():
         overlay_image(filename, 5, 3)
 
     sleep(1)
+
 
 def tweet(filename):
     text = get_tweet_text()
@@ -163,12 +173,13 @@ def get_tweet_text():
 
     return tweet_text
 
+
 def ready_for_tweet(filename):
    # camera.annotate_text = "Do you want to tweet the picture? Press the green button for yes and the red Button to cancel"
     print("Do you want to tweet the picture?")
     image = './tweet.png'
     image_overlay = overlay_image(filename, 0, 3)
-    tweet_text = overlay_image(image, 0 , 4)
+    tweet_text = overlay_image(image, 0, 4)
     while True:
         input_state_confirm = GPIO.input(pin_confirm_btn)
         input_state_cancel = GPIO.input(pin_cancel_btn)
@@ -190,6 +201,8 @@ def ready_for_tweet(filename):
 #                sleep(1)
                 remove_overlay(image_overlay)
                 camera.annotate_text = ""
+                counter.increasePictureCount()
+
                 break
         elif input_state_cancel == False:
             sleep(debounce)
@@ -206,12 +219,15 @@ def ready_for_tweet(filename):
         sleep(0.05)
     print("finished ready for tweet")
 
+
 def main():
     print("startup")
-    camera.start_preview(resolution=(screen_w,screen_h))
+    camera.start_preview(resolution=(screen_w, screen_h))
 #    camera.zoom = (0.0, 0.0, 2.0, 2.0)
 #    camera.annotate_text = "Press the bottom red Button to take a picture!"
     print("press the button to take a photo")
+    camera.annotate_text = ("Today taken pictures: " +
+                            str(counter.getPictureCount()))
     image = "./take_picture.png"
     pressed = False
     overlay = 0
@@ -231,12 +247,13 @@ def main():
             pressed = False
             overlay = overlay_image(image, 0, 4)
 
+
 try:
     main()
 except KeyboardInterrupt:
     print("goodbye")
 
-#except Exception as exception:
+# except Exception as exception:
 #    print("unexpected error: ", str(exception))
 
 finally:
