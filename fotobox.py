@@ -246,6 +246,8 @@ def main():
             take_picture()
             pressed = False
             overlay = overlay_image(image, 0, 4)
+            camera.annotate_text = ("Today taken pictures: " +
+                            str(counter.getPictureCount()))
 
 
 try:
