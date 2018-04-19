@@ -226,7 +226,7 @@ def main():
     camera.zoom = (zoom_x, zoom_y, zoom_w, zoom_h)
 #    camera.annotate_text = "Press the bottom red Button to take a picture!"
     print("press the button to take a photo")
-    camera.annotate_text = ("Today taken pictures: " +
+    camera.annotate_text = ("Bäume gepflanzt heute: " +
                             str(counter.getPictureCount()))
     image = "./take_picture.png"
     pressed = False
@@ -246,7 +246,7 @@ def main():
             take_picture()
             pressed = False
             overlay = overlay_image(image, 0, 4)
-            camera.annotate_text = ("Today taken pictures: " +
+            camera.annotate_text = ("Bäume gepflanzt heute: " +
                             str(counter.getPictureCount()))
 
 
