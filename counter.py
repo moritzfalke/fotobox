@@ -33,20 +33,12 @@ def writeData():
         json.dump(data, outfile, indent=5)
 
 
-def increasePictureCounter():
+def increasePictureCount():
     global pictureCount
     pictureCount += 1
     writeData()
 
 
-def getPictureCounter():
+def getPictureCount():
     global pictureCount
     return pictureCount
-
-
-createFile()
-readData()
-increasePictureCounter()
-increasePictureCounter()
-print(datetime.date.today())
-print(getPictureCounter())

@@ -8,8 +8,13 @@ import os
 from datetime import datetime
 from sys import exit as sys_exit
 from PIL import Image
+import counter
 
 REAL_PATH = os.path.dirname(os.path.realpath(__file__))
+
+# Setting up counter
+counter.createFile()
+counter.readData()
 
 # Setup Config
 config = configparser.ConfigParser()
@@ -178,6 +183,7 @@ def ready_for_tweet(filename):
 #                sleep(1)
                 remove_overlay(image_overlay)
                 camera.annotate_text = ""
+                counter.increasePictureCount()
 
                 break
         elif input_state_cancel == False:
@@ -202,6 +208,8 @@ def main():
 #    camera.zoom = (0.0, 0.0, 2.0, 2.0)
 #    camera.annotate_text = "Press the bottom red Button to take a picture!"
     print("press the button to take a photo")
+    camera.annotate_text = ("Today taken pictures: " +
+                            str(counter.getPictureCount()))
     image = "./take_picture.png"
     pressed = False
     overlay = 0
