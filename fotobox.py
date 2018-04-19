@@ -29,8 +29,8 @@ try:
 # Setup Twitter
     twitter_enabled = (config['TWITTER']['enable'] == 'X')
     if(twitter_enabled):
-        hashtags = config['TWITTER']['hashtags']
-        tweet_texts = config['TWITTER']['tweet_texts']
+        hashtags = config['TWITTER']['hashtags'].split(",")
+        tweet_texts = config['TWITTER']['tweet_texts'].split(",")
         consumer_key = config['TWITTER']['consumer_key']
         consumer_secret = config['TWITTER']['consumer_secret']
         access_token = config['TWITTER']['access_token']
