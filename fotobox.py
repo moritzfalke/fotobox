@@ -74,8 +74,6 @@ GPIO.setup(pin_cancel_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # Min duration (seconds) button is required to be "pressed in" for.
 debounce = 0.02
 
-pictureNumber = 0
-
 # Setup Camera
 
 camera = picamera.PiCamera()
@@ -173,9 +171,7 @@ def get_tweet_text():
     tweet_text = ''
     for hashtag in hashtags:
       tweet_text +=  ' #' + hashtag
-
-    global pictureNumber
-    tweet_text = tweet_texts[pictureNumber%len(tweet_texts)] + tweet_text
+    tweet_text = tweet_texts[counter.getPictureCount()%len(tweet_texts)] + tweet_text
 
     return tweet_text
 
