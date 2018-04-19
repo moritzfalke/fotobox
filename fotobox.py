@@ -29,8 +29,8 @@ try:
 # Setup Twitter
     twitter_enabled = (config['TWITTER']['enable'] == 'X')
     if(twitter_enabled):
-        always_hastags = config['TWITTER']['always_hashtags']
-        hashtags_amount = config['TWITTER']['hashtags_amount']
+        hashtags = config['TWITTER']['always_hashtags']
+        tweet_texts = config['TWITTER']['tweet_texts']
         consumer_key = config['TWITTER']['consumer_key']
         consumer_secret = config['TWITTER']['consumer_secret']
         access_token = config['TWITTER']['access_token']
@@ -62,6 +62,7 @@ GPIO.setup(pin_cancel_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 debounce = 0.02  # Min duration (seconds) button is required to be "pressed in" for.
 
+pictureNumber = 0
 
 # Setup Camera
 
@@ -140,6 +141,8 @@ def take_picture():
     camera.capture(filename)
     print("took a picture")
     if(twitter_enabled):
+        global pictureNumber
+        pictureNumber += 1
         ready_for_tweet(filename)
     else:
         overlay_image(filename, 5, 3)
@@ -148,6 +151,16 @@ def take_picture():
 
 def tweet(filename):
     twitter.update_with_media(filename, 'test')
+
+def get_tweet_text():
+    tweet_text = ''
+    for hashtag in hashtags:
+      tweet_text +=  ' #' + hashtag
+
+    global pictureNumber
+    tweet_text = tweet_texts[pictureNumber%len(pictureNumber)]
+
+    return tweet_text
 
 def ready_for_tweet(filename):
    # camera.annotate_text = "Do you want to tweet the picture? Press the green button for yes and the red Button to cancel"
