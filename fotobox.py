@@ -159,7 +159,7 @@ def get_tweet_text():
       tweet_text +=  ' #' + hashtag
 
     global pictureNumber
-    tweet_text = tweet_texts[pictureNumber%len(pictureNumber)] + tweet_text
+    tweet_text = tweet_texts[pictureNumber%len(tweet_texts)] + tweet_text
 
     return tweet_text
 
