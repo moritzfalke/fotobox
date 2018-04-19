@@ -30,6 +30,12 @@ try:
     photo_h = int(config['CONFIGURATION']['photo_h'])
     screen_w = int(config['CONFIGURATION']['screen_w'])
     screen_h = int(config['CONFIGURATION']['screen_h'])
+    zoom_x = float(config['ZOOM']['x'])
+    zoom_y = float(config['ZOOM']['y'])
+    zoom_w = float(config['ZOOM']['w'])
+    zoom_h = float(config['ZOOM']['h'])
+
+
 
 # Setup Twitter
     twitter_enabled = (config['TWITTER']['enable'] == 'X')
@@ -67,8 +73,6 @@ GPIO.setup(pin_cancel_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # Min duration (seconds) button is required to be "pressed in" for.
 debounce = 0.02
-
-pictureNumber = 0
 
 # Setup Camera
 
@@ -150,8 +154,6 @@ def take_picture():
     camera.capture(filename)
     print("took a picture")
     if(twitter_enabled):
-        global pictureNumber
-        pictureNumber += 1
         ready_for_tweet(filename)
     else:
         overlay_image(filename, 5, 3)
@@ -167,9 +169,7 @@ def get_tweet_text():
     tweet_text = ''
     for hashtag in hashtags:
       tweet_text +=  ' #' + hashtag
-
-    global pictureNumber
-    tweet_text = tweet_texts[pictureNumber%len(tweet_texts)] + tweet_text
+    tweet_text = tweet_texts[counter.getPictureCount()%len(tweet_texts)] + tweet_text
 
     return tweet_text
 
@@ -223,10 +223,10 @@ def ready_for_tweet(filename):
 def main():
     print("startup")
     camera.start_preview(resolution=(screen_w, screen_h))
-#    camera.zoom = (0.0, 0.0, 2.0, 2.0)
+    camera.zoom = (zoom_x, zoom_y, zoom_w, zoom_h)
 #    camera.annotate_text = "Press the bottom red Button to take a picture!"
     print("press the button to take a photo")
-    camera.annotate_text = ("Today taken pictures: " +
+    camera.annotate_text = ("Baeume gepflanzt heute: " +
                             str(counter.getPictureCount()))
     image = "./take_picture.png"
     pressed = False
@@ -246,6 +246,8 @@ def main():
             take_picture()
             pressed = False
             overlay = overlay_image(image, 0, 4)
+            camera.annotate_text = ("Baeume gepflanzt heute: " +
+                            str(counter.getPictureCount()))
 
 
 try:
