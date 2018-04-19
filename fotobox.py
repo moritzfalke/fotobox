@@ -8,6 +8,7 @@ import os
 from datetime import datetime
 from sys import exit as sys_exit
 from PIL import Image
+from tweepy import TweepError
 
 REAL_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -67,7 +68,7 @@ debounce = 0.02  # Min duration (seconds) button is required to be "pressed in" 
 camera = picamera.PiCamera()
 #camera.rotation = 270
 camera.resolution = (photo_h, photo_w)
-#camera.hflip = True
+camera.hflip = True
 
 def get_filename():
     filename = REAL_PATH + "/pictures/" + str(datetime.now()).split('.')[0]
@@ -164,7 +165,10 @@ def ready_for_tweet(filename):
                 remove_overlay(tweet_text)
                 wait_for_tweet = './wait_for_tweet.png'
                 o_wait = overlay_image(wait_for_tweet, 0 , 4)
-                tweet(filename)
+                try:
+                    tweet(filename)
+                except TweepError as te:
+                    print('Error while uploading to twitter')
                 remove_overlay(o_wait)
                 successful_tweet = './successful_tweet.png'
                 overlay_image(successful_tweet, 4, 4)
