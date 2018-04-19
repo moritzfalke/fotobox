@@ -105,3 +105,4 @@ ENV/
 .project
 .pydevproject
 .pydevproject.bak
+data.json
