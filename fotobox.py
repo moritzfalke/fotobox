@@ -9,6 +9,7 @@ from datetime import datetime
 from sys import exit as sys_exit
 from PIL import Image
 import counter
+from tweepy import TweepError
 
 REAL_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -33,8 +34,8 @@ try:
 # Setup Twitter
     twitter_enabled = (config['TWITTER']['enable'] == 'X')
     if(twitter_enabled):
-        always_hastags = config['TWITTER']['always_hashtags']
-        hashtags_amount = config['TWITTER']['hashtags_amount']
+        hashtags = config['TWITTER']['hashtags'].split(",")
+        tweet_texts = config['TWITTER']['tweet_texts'].split(",")
         consumer_key = config['TWITTER']['consumer_key']
         consumer_secret = config['TWITTER']['consumer_secret']
         access_token = config['TWITTER']['access_token']
@@ -67,13 +68,14 @@ GPIO.setup(pin_cancel_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # Min duration (seconds) button is required to be "pressed in" for.
 debounce = 0.02
 
+pictureNumber = 0
 
 # Setup Camera
 
 camera = picamera.PiCamera()
 #camera.rotation = 270
 camera.resolution = (photo_h, photo_w)
-#camera.hflip = True
+camera.hflip = True
 
 
 def get_filename():
@@ -148,6 +150,8 @@ def take_picture():
     camera.capture(filename)
     print("took a picture")
     if(twitter_enabled):
+        global pictureNumber
+        pictureNumber += 1
         ready_for_tweet(filename)
     else:
         overlay_image(filename, 5, 3)
@@ -156,7 +160,18 @@ def take_picture():
 
 
 def tweet(filename):
-    twitter.update_with_media(filename, 'test')
+    text = get_tweet_text()
+    twitter.update_with_media(filename, text)
+
+def get_tweet_text():
+    tweet_text = ''
+    for hashtag in hashtags:
+      tweet_text +=  ' #' + hashtag
+
+    global pictureNumber
+    tweet_text = tweet_texts[pictureNumber%len(tweet_texts)] + tweet_text
+
+    return tweet_text
 
 
 def ready_for_tweet(filename):
@@ -174,8 +189,11 @@ def ready_for_tweet(filename):
                 print("tweeting")
                 remove_overlay(tweet_text)
                 wait_for_tweet = './wait_for_tweet.png'
-                o_wait = overlay_image(wait_for_tweet, 0, 4)
-                tweet(filename)
+                o_wait = overlay_image(wait_for_tweet, 0 , 4)
+                try:
+                    tweet(filename)
+                except TweepError as te:
+                    print('Error while uploading to twitter')
                 remove_overlay(o_wait)
                 successful_tweet = './successful_tweet.png'
                 overlay_image(successful_tweet, 4, 4)
