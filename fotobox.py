@@ -154,8 +154,6 @@ def take_picture():
     camera.capture(filename)
     print("took a picture")
     if(twitter_enabled):
-        global pictureNumber
-        pictureNumber += 1
         ready_for_tweet(filename)
     else:
         overlay_image(filename, 5, 3)
