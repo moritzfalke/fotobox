@@ -150,7 +150,8 @@ def take_picture():
     sleep(1)
 
 def tweet(filename):
-    twitter.update_with_media(filename, 'test')
+    text = get_tweet_text()
+    twitter.update_with_media(filename, text)
 
 def get_tweet_text():
     tweet_text = ''
@@ -158,7 +159,7 @@ def get_tweet_text():
       tweet_text +=  ' #' + hashtag
 
     global pictureNumber
-    tweet_text = tweet_texts[pictureNumber%len(pictureNumber)]
+    tweet_text = tweet_texts[pictureNumber%len(pictureNumber)] + tweet_text
 
     return tweet_text
 
