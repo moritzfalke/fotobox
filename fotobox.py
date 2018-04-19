@@ -29,7 +29,7 @@ try:
 # Setup Twitter
     twitter_enabled = (config['TWITTER']['enable'] == 'X')
     if(twitter_enabled):
-        hashtags = config['TWITTER']['always_hashtags']
+        hashtags = config['TWITTER']['hashtags']
         tweet_texts = config['TWITTER']['tweet_texts']
         consumer_key = config['TWITTER']['consumer_key']
         consumer_secret = config['TWITTER']['consumer_secret']
