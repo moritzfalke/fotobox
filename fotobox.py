@@ -266,7 +266,7 @@ def main():
         if input_state_shutdown == False:
             sleep(debounce)
             if input_state_shutdown == False:
-                call("sudo nohup shutdown -r now", shell=True)
+                call("sudo nohup shutdown -h now", shell=True)
         sleep(0.05)
         if(pressed):
             camera.annotate_text = ""
