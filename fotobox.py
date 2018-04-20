@@ -1,15 +1,19 @@
 
-import tweepy
-from time import sleep
-import RPi.GPIO as GPIO
-import picamera
 import configparser
 import os
 from datetime import datetime
+from subprocess import call
 from sys import exit as sys_exit
+from time import sleep
+
+import RPi.GPIO as GPIO
+import picamera
+import tweepy
 from PIL import Image
-import counter
 from tweepy import TweepError
+
+import counter
+
 try:
     import httplib
 except:
@@ -29,6 +33,7 @@ try:
     pin_camera_btn = int(config['CONFIGURATION']['pin_camera_btn'])
     pin_confirm_btn = int(config['CONFIGURATION']['pin_confirm_btn'])
     pin_cancel_btn = int(config['CONFIGURATION']['pin_cancel_btn'])
+    pin_shutdown_btn = int(config['CONFIGURATION']['pin_shutdown_btn'])
     prep_delay = int(config['CONFIGURATION']['prep_delay'])
     photo_w = int(config['CONFIGURATION']['photo_w'])
     photo_h = int(config['CONFIGURATION']['photo_h'])
@@ -74,6 +79,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(pin_camera_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(pin_confirm_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(pin_cancel_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(pin_shutdown_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # Min duration (seconds) button is required to be "pressed in" for.
 debounce = 0.02
@@ -252,10 +258,15 @@ def main():
         if(overlay == 0):
             overlay = overlay_image(image, 0, 3)
         input_state = GPIO.input(pin_camera_btn)
+        input_state_shutdown = GPIO.input(pin_shutdown_btn)
         if input_state == False:
             sleep(debounce)
             if input_state == False:
                 pressed = True
+        if input_state_shutdown == False:
+            sleep(debounce)
+            if input_state_shutdown == False:
+                call("sudo nohup shutdown -r now", shell=True)
         sleep(0.05)
         if(pressed):
             camera.annotate_text = ""
