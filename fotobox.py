@@ -10,6 +10,10 @@ from sys import exit as sys_exit
 from PIL import Image
 import counter
 from tweepy import TweepError
+try:
+    import httplib
+except:
+    import http.client as httplib
 
 REAL_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -89,6 +93,16 @@ def get_filename():
     filename = filename.replace(':', '-')
     filename += ".jpg"
     return filename
+
+def have_internet():
+    conn = httplib.HTTPConnection("www.google.com", timeout=5)
+    try:
+        conn.request("HEAD", "/")
+        conn.close()
+        return True
+    except:
+        conn.close()
+        return False
 
 
 def remove_overlay(overlay_id):
@@ -210,6 +224,7 @@ def ready_for_tweet(filename):
                 print("cancelled tweeting")
                 remove_overlay(tweet_text)
                 cancel_tweet = './cancel_tweet.png'
+                os.remove(filename)
                 overlay_image(cancel_tweet, 4, 4)
 #                camera.annotate_text = "Did not tweet"
 #                sleep(1)
