@@ -171,20 +171,25 @@ def take_picture():
         ready_for_tweet(filename)
     else:
         overlay_image(filename, 5, 3)
-
+        os.remove(filename)
     sleep(1)
 
 
 def tweet(filename):
-    text = get_tweet_text()
-    twitter.update_with_media(filename, text)
+    if(have_internet()):
+        text = get_tweet_text()
+        try:
+            twitter.update_with_media(filename, text)
+            os.remove(filename)
+        except TweepError as te:
+            print('Error while uploading to twitter')
+
 
 def get_tweet_text():
     tweet_text = ''
     for hashtag in hashtags:
       tweet_text +=  ' #' + hashtag
     tweet_text = tweet_texts[counter.getPictureCount()%len(tweet_texts)] + tweet_text
-
     return tweet_text
 
 
@@ -204,10 +209,7 @@ def ready_for_tweet(filename):
                 remove_overlay(tweet_text)
                 wait_for_tweet = './wait_for_tweet.png'
                 o_wait = overlay_image(wait_for_tweet, 0 , 4)
-                try:
-                    tweet(filename)
-                except TweepError as te:
-                    print('Error while uploading to twitter')
+                tweet(filename)
                 remove_overlay(o_wait)
                 successful_tweet = './successful_tweet.png'
                 overlay_image(successful_tweet, 4, 4)
