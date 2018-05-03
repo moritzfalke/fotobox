@@ -245,14 +245,14 @@ def ready_for_tweet(filename):
                     os.remove(filename)
                 except OSError:
                     pass
-    sleep(1)
+                sleep(1)
                 overlay_image(cancel_tweet, 4, 4)
 #                camera.annotate_text = "Did not tweet"
 #                sleep(1)
                 remove_overlay(image_overlay)
                 camera.annotate_text = ""
                 break
-        sleep(0.05)
+    sleep(0.05)
     print("finished ready for tweet")
 
 i = 0
