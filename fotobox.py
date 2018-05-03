@@ -136,7 +136,7 @@ def overlay_image(image_path, duration=0, layer=3):
     img = Image.open(image_path)
 
     # Create an image padded to the required size with mode 'RGB'
-    pad = Image.new('RGB', (
+    pad = Image.new('RGBA', (
         ((img.size[0] + 31) // 32) * 32,
         ((img.size[1] + 15) // 16) * 16,
     ))
@@ -270,11 +270,8 @@ def main():
 
     image1 = "./take_picture.png"
     image2 = "./take_picture2.png"
-    overlay_1 = overlay_image(image1, 0, 3)
-    overlay_2 = overlay_image(image2, 0, 4)
+    overlay = overlay_image(image1, 0, 3)
 
-#   make overlay_2 invisible
-    overlay_2.alpha = 0
 
     i = 0
     blink_speed = 10
@@ -305,11 +302,11 @@ def main():
 
             i = i + 1
             if i == blink_speed:
-                overlay_1.alpha = 0
-                overlay_2.alpha = 255
+                remove_overlay(overlay)
+                overlay = overlay_image(image2, 0, 3)
             elif i == (2 * blink_speed):
-                overlay_1.alpha = 255
-                overlay_2.alpha = 0
+                remove_overlay(overlay)
+                overlay = overlay_image(image1, 0, 3)
                 i = 0
 
             sleep(0.1)
@@ -322,8 +319,7 @@ def main():
         GPIO.remove_event_detect(pin_camera_btn)
         GPIO.remove_event_detect(pin_shutdown_btn)
 
-        remove_overlay(overlay_1)
-        remove_overlay(overlay_2)
+        remove_overlay(overlay)
         camera.annotate_text = ""
 
         take_picture()
@@ -332,8 +328,7 @@ def main():
         camera.annotate_text = ("Baeume gepflanzt heute: " +
                                 str(counter.getPictureCount()))
 
-        overlay_1 = overlay_image(image1, 0, 3)
-        overlay_2 = overlay_image(image2, 0, 4)
+        overlay = overlay_image(image1, 0, 3)
 
         GPIO.add_event_detect(pin_camera_btn, GPIO.FALLING)
         GPIO.add_event_detect(pin_shutdown_btn, GPIO.FALLING)
