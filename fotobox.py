@@ -193,7 +193,7 @@ def tweet(filename):
                 os.remove(filename)
             except OSError:
                 pass
-    sleep(1)
+            sleep(1)
         except TweepError as te:
             print('Error while uploading to twitter')
 
