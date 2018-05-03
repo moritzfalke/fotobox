@@ -177,7 +177,10 @@ def take_picture():
         ready_for_tweet(filename)
     else:
         overlay_image(filename, 5, 3)
-        os.remove(filename)
+        try:
+            os.remove(filename)
+        except OSError:
+            pass
     sleep(1)
 
 
@@ -186,7 +189,11 @@ def tweet(filename):
         text = get_tweet_text()
         try:
             twitter.update_with_media(filename, text)
-            os.remove(filename)
+            try:
+                os.remove(filename)
+            except OSError:
+                pass
+    sleep(1)
         except TweepError as te:
             print('Error while uploading to twitter')
 
@@ -206,8 +213,10 @@ def ready_for_tweet(filename):
     image_overlay = overlay_image(filename, 0, 3)
     tweet_text = overlay_image(image, 0, 4)
     while True:
+
         input_state_confirm = GPIO.input(pin_confirm_btn)
         input_state_cancel = GPIO.input(pin_cancel_btn)
+
         if input_state_confirm == False:
             sleep(debounce)
             if input_state_confirm == False:
@@ -224,15 +233,19 @@ def ready_for_tweet(filename):
                 remove_overlay(image_overlay)
                 camera.annotate_text = ""
                 counter.increasePictureCount()
-
                 break
+
         elif input_state_cancel == False:
             sleep(debounce)
             if input_state_cancel == False:
                 print("cancelled tweeting")
                 remove_overlay(tweet_text)
                 cancel_tweet = './cancel_tweet.png'
-                os.remove(filename)
+                try:
+                    os.remove(filename)
+                except OSError:
+                    pass
+    sleep(1)
                 overlay_image(cancel_tweet, 4, 4)
 #                camera.annotate_text = "Did not tweet"
 #                sleep(1)
@@ -242,40 +255,122 @@ def ready_for_tweet(filename):
         sleep(0.05)
     print("finished ready for tweet")
 
+i = 0
+blink_speed = 10
 
 def main():
     print("startup")
     camera.start_preview(resolution=(screen_w, screen_h))
     camera.zoom = (zoom_x, zoom_y, zoom_w, zoom_h)
+
 #    camera.annotate_text = "Press the bottom red Button to take a picture!"
     print("press the button to take a photo")
     camera.annotate_text = ("Baeume gepflanzt heute: " +
                             str(counter.getPictureCount()))
-    image = "./take_picture.png"
-    pressed = False
-    overlay = 0
+
+    image1 = "./take_picture.png"
+    image2 = "./take_picture2.png"
+    overlay_1 = overlay_image(image1, 0, 3)
+    overlay_2 = overlay_image(image2, 0, 4)
+
+#   make overlay_2 invisible
+    overlay_2.alpha = 0
+
+    i = 0
+    blink_speed = 10
+
+    GPIO.add_event_detect(pin_camera_btn, GPIO.FALLING)
+    GPIO.add_event_detect(pin_shutdown_btn, GPIO.FALLING)
+
     while True:
-        if(overlay == 0):
-            overlay = overlay_image(image, 0, 3)
-        input_state = GPIO.input(pin_camera_btn)
-        input_state_shutdown = GPIO.input(pin_shutdown_btn)
-        if input_state == False:
+
+        camera_btn_pressed = None
+        shutdown_btn_pressed = None
+
+        if GPIO.event_detected(pin_camera_btn):
             sleep(debounce)
-            if input_state == False:
-                pressed = True
-        if input_state_shutdown == False:
+            if GPIO.input(pin_camera_btn) == 0:
+                camera_btn_pressed = True
+
+        if GPIO.event_detected(pin_shutdown_btn):
             sleep(debounce)
-            if input_state_shutdown == False:
-                call("sudo nohup shutdown -h now", shell=True)
-        sleep(0.05)
-        if(pressed):
-            camera.annotate_text = ""
-            remove_overlay(overlay)
-            take_picture()
-            pressed = False
-            overlay = overlay_image(image, 0, 4)
-            camera.annotate_text = ("Baeume gepflanzt heute: " +
-                            str(counter.getPictureCount()))
+            if GPIO.input(pin_shutdown_btn) == 0:
+                shutdown_btn_pressed = True
+
+        if shutdown_btn_pressed is not None:
+            call("sudo nohup shutdown -h now", shell=True)
+
+
+        if camera_btn_pressed is not None:
+
+            i = i + 1
+            if i == blink_speed:
+                overlay_1.alpha = 0
+                overlay_2.alpha = 255
+            elif i == (2 * blink_speed):
+                overlay_1.alpha = 255
+                overlay_2.alpha = 0
+                i = 0
+
+            sleep(0.1)
+            continue
+
+
+        print("Button Pressed")
+
+        #Silence GPIO detection
+        GPIO.remove_event_detect(pin_camera_btn)
+        GPIO.remove_event_detect(pin_shutdown_btn)
+
+        remove_overlay(overlay_1)
+        remove_overlay(overlay_2)
+        camera.annotate_text = ""
+
+        take_picture()
+
+
+        camera.annotate_text = ("Baeume gepflanzt heute: " +
+                                str(counter.getPictureCount()))
+
+        overlay_1 = overlay_image(image1, 0, 3)
+        overlay_2 = overlay_image(image2, 0, 4)
+
+        GPIO.add_event_detect(pin_camera_btn, GPIO.FALLING)
+        GPIO.add_event_detect(pin_shutdown_btn, GPIO.FALLING)
+        print("ready to take a picture again!")
+
+
+        # if(overlay_1 == 0):
+        #     overlay_1 = overlay_image(image, 0, 3)
+        # input_state = GPIO.input(pin_camera_btn)
+        # input_state_shutdown = GPIO.input(pin_shutdown_btn)
+        # if input_state == False:
+        #     sleep(debounce)
+        #     if input_state == False:
+        #         pressed = True
+        # if input_state_shutdown == False:
+        #     sleep(debounce)
+        #     if input_state_shutdown == False:
+        #         call("sudo nohup shutdown -h now", shell=True)
+        # sleep(0.05)
+        # if(not pressed):
+        #     i = i + 1
+        #     if( i == blink_speed):
+        #         overlay_1.alpha = 0
+        #         overlay_2.alpha = 255
+        #     elif( i == (2 * blink_speed)):
+        #         overlay_1.alpha = 255
+        #         overlay_2.slpha = 0
+        #         i = 0
+        #
+        # if(pressed):
+        #     camera.annotate_text = ""
+        #     remove_overlay(overlay)
+        #     take_picture()
+        #     pressed = False
+        #     overlay = overlay_image(image, 0, 4)
+        #     camera.annotate_text = ("Baeume gepflanzt heute: " +
+        #                     str(counter.getPictureCount()))
 
 
 try:
