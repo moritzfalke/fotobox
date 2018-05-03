@@ -136,7 +136,7 @@ def overlay_image(image_path, duration=0, layer=3):
     img = Image.open(image_path)
 
     # Create an image padded to the required size with mode 'RGB'
-    pad = Image.new('RGBA', (
+    pad = Image.new('RGB', (
         ((img.size[0] + 31) // 32) * 32,
         ((img.size[1] + 15) // 16) * 16,
     ))
