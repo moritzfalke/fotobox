@@ -302,10 +302,10 @@ def main():
 
             i = i + 1
             if i == blink_speed:
-                remove_overlay(overlay)
+#                remove_overlay(overlay)
                 overlay = overlay_image(image2, 0, 3)
             elif i == (2 * blink_speed):
-                remove_overlay(overlay)
+#                remove_overlay(overlay)
                 overlay = overlay_image(image1, 0, 3)
                 i = 0
 
