@@ -301,7 +301,7 @@ def main():
             call("sudo nohup shutdown -h now", shell=True)
 
 
-        if camera_btn_pressed is not None:
+        if camera_btn_pressed is None:
 
             i = i + 1
             if i == blink_speed:
