@@ -337,39 +337,6 @@ def main():
         print("ready to take a picture again!")
 
 
-        # if(overlay_1 == 0):
-        #     overlay_1 = overlay_image(image, 0, 3)
-        # input_state = GPIO.input(pin_camera_btn)
-        # input_state_shutdown = GPIO.input(pin_shutdown_btn)
-        # if input_state == False:
-        #     sleep(debounce)
-        #     if input_state == False:
-        #         pressed = True
-        # if input_state_shutdown == False:
-        #     sleep(debounce)
-        #     if input_state_shutdown == False:
-        #         call("sudo nohup shutdown -h now", shell=True)
-        # sleep(0.05)
-        # if(not pressed):
-        #     i = i + 1
-        #     if( i == blink_speed):
-        #         overlay_1.alpha = 0
-        #         overlay_2.alpha = 255
-        #     elif( i == (2 * blink_speed)):
-        #         overlay_1.alpha = 255
-        #         overlay_2.slpha = 0
-        #         i = 0
-        #
-        # if(pressed):
-        #     camera.annotate_text = ""
-        #     remove_overlay(overlay)
-        #     take_picture()
-        #     pressed = False
-        #     overlay = overlay_image(image, 0, 4)
-        #     camera.annotate_text = ("Baeume gepflanzt heute: " +
-        #                     str(counter.getPictureCount()))
-
-
 try:
     main()
 except KeyboardInterrupt:
