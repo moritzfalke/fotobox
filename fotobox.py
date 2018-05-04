@@ -21,7 +21,7 @@ except:
 
 REAL_PATH = os.path.dirname(os.path.realpath(__file__))
 
-# Setting up counter
+# Setup counter
 counter.createFile()
 counter.readData()
 
@@ -64,7 +64,7 @@ except KeyError as exc:
     print('')
     sys_exit()
 
-
+# Generate Twitter Authentication
 if(twitter_enabled):
     try:
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
@@ -85,13 +85,12 @@ GPIO.setup(pin_shutdown_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 debounce = 0.02
 
 # Setup Camera
-
 camera = picamera.PiCamera()
 #camera.rotation = 270
 camera.resolution = (photo_h, photo_w)
 camera.hflip = True
 
-
+# Get the name of the file the picture will be saved as
 def get_filename():
     filename = REAL_PATH + "/pictures/" + str(datetime.now()).split('.')[0]
     filename = filename.replace(' ', '_')
@@ -99,6 +98,7 @@ def get_filename():
     filename += ".jpg"
     return filename
 
+# try to ping google to check internet connections
 def have_internet():
     conn = httplib.HTTPConnection("www.google.com", timeout=5)
     try:
@@ -196,7 +196,7 @@ def tweet(filename):
         except TweepError as te:
             print('Error while uploading to twitter')
 
-
+# get the text for the tweet
 def get_tweet_text():
     tweet_text = ''
     for hashtag in hashtags:
@@ -204,9 +204,8 @@ def get_tweet_text():
     tweet_text = tweet_texts[counter.getPictureCount()%len(tweet_texts)] + tweet_text
     return tweet_text
 
-
+# ask the user weather or not to tweet the picture
 def ready_for_tweet(filename):
-
     print("Do you want to tweet the picture?")
     image = './tweet.png'
     image_overlay = overlay_image(filename, 0, 3)
@@ -251,8 +250,10 @@ def ready_for_tweet(filename):
     print("finished ready for tweet")
 
 i = 0
+# nuber of cycles after which the overlay switches
 blink_speed = 10
 
+# main program loop
 def main():
 
     print("startup")
@@ -328,6 +329,7 @@ def main():
 
         overlay = overlay_image(image1, 0, 3)
 
+        # restart GPIO detection
         GPIO.add_event_detect(pin_camera_btn, GPIO.FALLING)
         GPIO.add_event_detect(pin_shutdown_btn, GPIO.FALLING)
         print("ready to take a picture again!")
