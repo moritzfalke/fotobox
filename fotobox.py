@@ -94,7 +94,6 @@ camera.hflip = True
 
 def get_filename():
     filename = REAL_PATH + "/pictures/" + str(datetime.now()).split('.')[0]
-#    filename = "/pictures/" + str(datetime.now()).split('.')[0]
     filename = filename.replace(' ', '_')
     filename = filename.replace(':', '-')
     filename += ".jpg"
@@ -207,7 +206,7 @@ def get_tweet_text():
 
 
 def ready_for_tweet(filename):
-   # camera.annotate_text = "Do you want to tweet the picture? Press the green button for yes and the red Button to cancel"
+
     print("Do you want to tweet the picture?")
     image = './tweet.png'
     image_overlay = overlay_image(filename, 0, 3)
@@ -228,8 +227,6 @@ def ready_for_tweet(filename):
                 remove_overlay(o_wait)
                 successful_tweet = './successful_tweet.png'
                 overlay_image(successful_tweet, 4, 4)
-#                camera.annotate_text = "tweeted successfully!"
-#                sleep(1)
                 remove_overlay(image_overlay)
                 camera.annotate_text = ""
                 counter.increasePictureCount()
@@ -247,8 +244,6 @@ def ready_for_tweet(filename):
                     pass
                 sleep(1)
                 overlay_image(cancel_tweet, 4, 4)
-#                camera.annotate_text = "Did not tweet"
-#                sleep(1)
                 remove_overlay(image_overlay)
                 camera.annotate_text = ""
                 break
@@ -259,11 +254,12 @@ i = 0
 blink_speed = 10
 
 def main():
+
     print("startup")
+
     camera.start_preview(resolution=(screen_w, screen_h))
     camera.zoom = (zoom_x, zoom_y, zoom_w, zoom_h)
 
-#    camera.annotate_text = "Press the bottom red Button to take a picture!"
     print("press the button to take a photo")
     camera.annotate_text = ("Baeume gepflanzt heute: " +
                             str(counter.getPictureCount()))
