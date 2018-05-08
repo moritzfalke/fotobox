@@ -97,6 +97,7 @@ ENV/
 # mkdocs documentation
 /site
 
+
 # mypy
 .mypy_cache/
 
@@ -106,3 +107,6 @@ ENV/
 .pydevproject
 .pydevproject.bak
 data.json
+
+# config
+config.ini
